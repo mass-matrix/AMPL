@@ -177,8 +177,10 @@ python -m ipykernel install --user --name atomsci-env
   - If this doesn't work, exit the container and change port from 8888 to some other number such as 7777 or 8899 (in all 3 places it's written), then rerun both commands
 - From the notebook, you may need to set the kernel that atomsci is installed ("atomsci-venv") in order to acccess the `atomsci` package.
 
-> ***Note***: *Be sure to save any work you want to be permanent in your workspace folder. If the container is shut down, you'll lose anything not in that folder.*  
----
+
+### Using Makefile
+
+## If you have `make` installed on your computer, you can quickly get a notebook up and running using the available commands. See further documentation in [Makefile.md](./Makefile.md) and script definitions in [Makefile](./Makefile)
 
 ## Uninstall
 To remove AMPL from a pip environment use:
