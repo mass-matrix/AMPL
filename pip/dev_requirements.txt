@@ -7,5 +7,6 @@ matplotlib-venn
 MolVS
 mordred
 pytest
+ruff
 seaborn>=0.13.0
 umap-learn
