@@ -1,0 +1,27 @@
+name: ampl
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-gpu-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push Docker image (gpu)
+        run: |
+          make build-docker push-docker
+        env:
+          ENV: $(echo "${{ github.ref }}" | cut -d'/' -f3)
+          PLATFORM: gpu
+          IMAGE_REPO: kartstig/ampl
+  build-cpu-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push Docker image (cpu)
+        run: |
+          make build-docker push-docker
+        env:
+          ENV: $(echo "${{ github.ref }}" | cut -d'/' -f3)
+          PLATFORM: cpu
+          IMAGE_REPO: kartstig/ampl
