@@ -10,7 +10,6 @@ IMAGE_REPO ?= atomsci/atomsci-ampl
 # Jupyter Port
 JUPYTER_PORT ?= 8888
 
-
 # Python Executable
 PYTHON_BIN ?= $(shell which python)
 
@@ -22,22 +21,27 @@ WORK_DIR ?= work
 
 .PHONY: build-docker install install-system install-venv jupyter-notebook jupyter-lab pytest ruff ruff-fix setup uninstall uninstall-system uninstall-venv
 
+# Pull Docker image
 pull-docker:
 	docker pull $(IMAGE_REPO):$(PLATFORM)-$(ENV)
 
+# Push Docker image
 push-docker:
 	docker push $(IMAGE_REPO):$(PLATFORM)-$(ENV)
 
+# Build Docker image
 build-docker:
 	@echo "Building Docker image for $(PLATFORM)"
 	docker build -t $(IMAGE_REPO):$(PLATFORM)-$(ENV) --build-arg ENV=$(ENV) -f Dockerfile.$(PLATFORM) .
 
+# Install atomsci-ampl system-wide
 install: install-system
 
 install-system:
 	@echo "Installing atomsci-ampl into $(PYTHON_BIN)"
 	$(PYTHON_BIN) -m pip install -e .
 
+# Install atomsci-ampl in virtual environment
 install-venv:
 	@echo "Installing atomsci-ampl into $(VENV)/"
 	$(VENV)/bin/python -m pip install -e .
@@ -59,9 +63,9 @@ jupyter-lab:
 # Run pytest
 pytest:
 	@echo "Running pytest"
-	$(VENV)/bin/pytest atomsci/
-	# docker run -it -v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
-	# 	/bin/bash -l -c "pytest"
+	docker run -it -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
+		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
+		/bin/bash -l -c "pytest"
 
 # Run ruff linter
 ruff:
@@ -71,7 +75,7 @@ ruff:
 # Run ruff linter with fix
 ruff-fix:
 	@echo "Running ruff with fix"
-	$(VENV)/bin/ruff check . --fix
+	docker run -it $(IMAGE_REPO):$(PLATFORM)-$(ENV) /bin/bash -l -c "ruff check . --fix"
 
 # Setup virtual environment and install dependencies
 setup:
@@ -88,12 +92,14 @@ setup:
 	$(VENV)/bin/pip install -r pip/dev_requirements.txt
 	$(MAKE) install
 
+# Uninstall atomsci-ampl system-wide
 uninstall: uninstall-system
 
 uninstall-system:
 	@echo "Uninstalling atomsci-ampl from $(PYTHON_BIN)"
 	$(PYTHON_BIN) -m pip uninstall atomsci-ampl --yes
 
+# Uninstall atomsci-ampl from virtual environment
 uninstall-venv:
 	@echo "Uninstalling atomsci-ampl from $(VENV)/"
 	$(VENV)/bin/python -m pip uninstall atomsci-ampl --yes
