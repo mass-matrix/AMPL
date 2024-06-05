@@ -1,6 +1,7 @@
 bokeh
 bravado
 ipykernel
+jupyter
 maestrowf
 matplotlib
 matplotlib-venn
