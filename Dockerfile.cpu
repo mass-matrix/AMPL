@@ -10,10 +10,14 @@ RUN apt update -y && apt install -y \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY ./pip/ ./pip
-RUN pip install -U pip
-RUN pip install -r ./pip/cpu_requirements.txt
-RUN pip install -r ./pip/dev_requirements.txt
+COPY ./pip/cpu_requirements.txt ./pip/cpu_requirements.txt
+RUN pip install -U pip && pip install --no-cache-dir -r ./pip/cpu_requirements.txt
+
+COPY ./pip/dev_requirements.txt ./pip/dev_requirements.txt
+COPY install_dev_dependencies.sh .
+RUN chmod +x install_dev_dependencies.sh
+ARG ENV=dev
+RUN ./install_dev_dependencies.sh $ENV
 
 COPY setup.py .
 COPY VERSION .
@@ -22,3 +26,9 @@ COPY ./atomsci atomsci/
 
 RUN ./build.sh
 RUN pip install -e .
+
+# Clean up
+RUN apt purge -y build-essential python3-dev && \
+    apt autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+RUN rm -rf /root/.cache/pip

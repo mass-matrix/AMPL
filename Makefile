@@ -1,16 +1,18 @@
 # Environment
 ENV ?= dev
 
-# Jupyter Port
-JUPYTER_PORT ?= 8888
-
+# GPU / CPU
 PLATFORM ?= gpu
-
-# Python Executable
-PYTHON_BIN ?= $(shell which python)
 
 # IMAGE REPOSITORY
 IMAGE_REPO ?= atomsci/atomsci-ampl
+
+# Jupyter Port
+JUPYTER_PORT ?= 8888
+
+
+# Python Executable
+PYTHON_BIN ?= $(shell which python)
 
 # Virtual Environment
 VENV ?= venv
@@ -20,12 +22,15 @@ WORK_DIR ?= work
 
 .PHONY: build-docker install install-system install-venv jupyter-notebook jupyter-lab pytest ruff ruff-fix setup uninstall uninstall-system uninstall-venv
 
+pull-docker:
+	docker pull $(IMAGE_REPO):$(PLATFORM)-$(ENV)
+
 push-docker:
 	docker push $(IMAGE_REPO):$(PLATFORM)-$(ENV)
 
 build-docker:
 	@echo "Building Docker image for $(PLATFORM)"
-	docker build -t $(IMAGE_REPO):$(PLATFORM)-$(ENV) -f Dockerfile.$(PLATFORM) .
+	docker build -t $(IMAGE_REPO):$(PLATFORM)-$(ENV) --build-arg ENV=$(ENV) -f Dockerfile.$(PLATFORM) .
 
 install: install-system
 
@@ -40,30 +45,28 @@ install-venv:
 # Run Jupyter Notebook
 jupyter-notebook:
 	@echo "Starting Jupyter Notebook"
-	docker pull $(IMAGE_REPO)
 	docker run -it -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
-		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO) \
+		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
 		/bin/bash -l -c "jupyter-notebook --ip=0.0.0.0 --allow-root --port=$(JUPYTER_PORT)"
 
 # Run Jupyter Lab
 jupyter-lab:
 	@echo "Starting Jupyter Lab"
-	docker pull $(IMAGE_REPO)
 	docker run -it -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
-		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO) \
+		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
 		/bin/bash -l -c "jupyter-lab --ip=0.0.0.0 --allow-root --port=$(JUPYTER_PORT)"
 
 # Run pytest
 pytest:
 	@echo "Running pytest"
 	$(VENV)/bin/pytest atomsci/
-	# docker run -it -v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO)-dev \
+	# docker run -it -v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
 	# 	/bin/bash -l -c "pytest"
 
 # Run ruff linter
 ruff:
 	@echo "Running ruff"
-	$(VENV)/bin/ruff check .
+	docker run -it $(IMAGE_REPO):$(PLATFORM)-$(ENV) /bin/bash -l -c "ruff check ."
 
 # Run ruff linter with fix
 ruff-fix:
