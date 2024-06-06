@@ -1,4 +1,4 @@
-name: mzml_web
+name: ampl
 
 on: [push]
 
