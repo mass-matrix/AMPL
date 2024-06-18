@@ -1,6 +1,8 @@
 FROM python:3.9
 
+# Prevent interactive dialogs from halting the build
 ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt update -y && apt install -y \
     build-essential \
     libcairo2-dev \
@@ -24,6 +26,7 @@ COPY VERSION .
 COPY build.sh .
 COPY ./atomsci atomsci/
 
+# Install atomsci-ampl
 RUN ./build.sh
 RUN pip install -e .
 

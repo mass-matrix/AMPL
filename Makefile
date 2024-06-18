@@ -19,7 +19,8 @@ VENV ?= venv
 # Work Directory
 WORK_DIR ?= work
 
-.PHONY: build-docker install install-system install-venv jupyter-notebook jupyter-lab pytest ruff ruff-fix setup uninstall uninstall-system uninstall-venv
+.PHONY: build-docker install install-dev install-system install-venv jupyter-notebook jupyter-lab \
+	pytest ruff ruff-fix setup uninstall uninstall-dev uninstall-system uninstall-venv
 
 # Pull Docker image
 pull-docker:
@@ -34,9 +35,14 @@ build-docker:
 	@echo "Building Docker image for $(PLATFORM)"
 	docker build -t $(IMAGE_REPO):$(PLATFORM)-$(ENV) --build-arg ENV=$(ENV) -f Dockerfile.$(PLATFORM) .
 
-# Install atomsci-ampl system-wide
 install: install-system
 
+# Install atomsci-ampl in user space
+install-dev:
+	@echo "Installing atomsci-ampl for user"
+	$(PYTHON_BIN) -m pip install -e . --user
+
+# Install atomsci-ampl system-wide
 install-system:
 	@echo "Installing atomsci-ampl into $(PYTHON_BIN)"
 	$(PYTHON_BIN) -m pip install -e .
@@ -80,7 +86,9 @@ ruff-fix:
 # Setup virtual environment and install dependencies
 setup:
 	@echo "Setting up virtual environment with $(PLATFORM) dependencies"
+	@echo "Removing old environment"
 	rm -rf $(VENV)/ || true
+	@echo "Creating new venv"
 	python3.9 -m venv $(VENV)/
 	$(VENV)/bin/pip install -U pip
 	@echo "Installing dependencies"
@@ -90,11 +98,16 @@ setup:
 		$(VENV)/bin/pip install -r pip/cpu_requirements.txt; \
 	fi
 	$(VENV)/bin/pip install -r pip/dev_requirements.txt
-	$(MAKE) install
+	$(MAKE) install-venv
 
-# Uninstall atomsci-ampl system-wide
 uninstall: uninstall-system
 
+# Uninstall atomsci-ampl from user space
+uninstall-dev:
+	@echo "Uninstalling atomsci-ampl for user"
+	$(PYTHON_BIN) -m pip uninstall atomsci-ampl --user --yes
+
+# Uninstall atomsci-ampl system-wide
 uninstall-system:
 	@echo "Uninstalling atomsci-ampl from $(PYTHON_BIN)"
 	$(PYTHON_BIN) -m pip uninstall atomsci-ampl --yes
