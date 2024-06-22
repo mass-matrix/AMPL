@@ -1,0 +1,16 @@
+#!/bin/bash
+set -ex
+
+# Git repo
+git clone https://github.com/mass-matrix/AMPL
+cd AMPL/
+
+# Ensure work directory is there
+mkdir -p work/
+
+# Get config file
+pfda download-file .env
+
+# Docker
+make pull-docker
+make jupyter-notebook
