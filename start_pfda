@@ -10,6 +10,7 @@ mkdir -p work/
 
 # Get config file
 pfda download-file .env
+. .env
 
 # Docker
 make pull-docker
