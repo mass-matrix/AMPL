@@ -9,7 +9,7 @@ cd AMPL/
 mkdir -p work/
 
 # Get config file
-pfda download-file .env
+yes | pfda download .env || true
 . .env
 
 # Docker
