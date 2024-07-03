@@ -56,14 +56,14 @@ install-venv:
 jupyter-notebook:
 	@echo "Starting Jupyter Notebook"
 	docker run -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
-		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
+		-v $(shell pwd)/../$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
 		/bin/bash -l -c "jupyter-notebook --ip=0.0.0.0 --allow-root --port=$(JUPYTER_PORT)"
 
 # Run Jupyter Lab
 jupyter-lab:
 	@echo "Starting Jupyter Lab"
 	docker run -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
-		-v $(shell pwd)/$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
+		-v $(shell pwd)/../$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
 		/bin/bash -l -c "jupyter-lab --ip=0.0.0.0 --allow-root --port=$(JUPYTER_PORT)"
 
 # Run pytest
