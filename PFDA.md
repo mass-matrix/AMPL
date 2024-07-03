@@ -38,3 +38,32 @@ export WORK_DIR=work/                   # Working directory to use
 ![Jupyter Notebook](https://i.imgur.com/PuXkrmx.png)
 
 7. Replace `127.0.0.1` with the workstation host and add `:8080` to the end. Enter this into the browser URL.
+
+**_Note:_** The Precision FDA Environment has a very short lived session. If you have a slow network connection, you may be logged out before the
+
+## Importing Existing Models
+
+There are a couple options for importing an pre-trained model. Most models come in the form of a `.tar.gz`. The first steps will be to create a workstation using the instruction above. Once this workstation is running, and open (Step 4), proceed as follows:
+
+1. Upload trained models to pFDA using the Files interface. Click on the `Add Files` button and follow the dialog to upload to pFDA.
+
+![Pre-trained model example](https://i.imgur.com/W7rfzaD.png)
+
+2. In the Workstation tab, create a directory called `work/` and `cd` into it by running the following
+
+```
+mkdir work
+```
+
+![mkdir command](https://i.imgur.com/4Xq9WPc.png)
+
+3. Download the model to the Workstation inside the `work/` directory, and return to the home directory
+
+```
+pfda download <name_of_model.tar.gz>
+cd ..
+```
+
+![pfda download command](https://i.imgur.com/lvbYRRi.png)
+
+4. Continue from Step 5 above to run your notebook
