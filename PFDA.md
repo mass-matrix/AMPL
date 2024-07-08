@@ -67,3 +67,12 @@ cd ..
 ![pfda download command](https://i.imgur.com/lvbYRRi.png)
 
 4. Continue from Step 5 above to run your notebook
+
+# Updating the AMPL Snapshot on Precision FDA
+
+There are 2 scripts which are used to help with installing and running AMPL on pFDA:
+
+- [install_pfda](./install_pfda)
+  This script was used to bootstrap the initial snapshot. The only major requirement for running pFDA is Docker. Hopefully this script should not need to updated, but in the event that it does, you will want to append any necessary commands to this script so that we can track it. Once the script has been updated, copy it from version control, and paste it into the Workstation. After running all commands, create a new snapshot with a new version.
+- [start_pfda](./start_pfda)
+  This is the script which is instructed to the end-user to run once they've downloaded all the files which they need for their Workstation. The purpose of this script is to download a fresh docker image and clone the latest `master` for AMPL before starting the Jupyter Notebook. Because of the way this script will call `make`, some parts can be updated in version control. Similarly to the other script, once changes have been made, a new snapshot will be necessary.
