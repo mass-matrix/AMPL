@@ -76,3 +76,46 @@ There are 2 scripts which are used to help with installing and running AMPL on p
   This script was used to bootstrap the initial snapshot. The only major requirement for running pFDA is Docker. Hopefully this script should not need to updated, but in the event that it does, you will want to append any necessary commands to this script so that we can track it. Once the script has been updated, copy it from version control, and paste it into the Workstation. After running all commands, create a new snapshot with a new version.
 - [start_pfda](./start_pfda)
   This is the script which is instructed to the end-user to run once they've downloaded all the files which they need for their Workstation. The purpose of this script is to download a fresh docker image and clone the latest `master` for AMPL before starting the Jupyter Notebook. Because of the way this script will call `make`, some parts can be updated in version control. Similarly to the other script, once changes have been made, a new snapshot will be necessary.
+
+# Other Notes about pFDA
+
+## Re-attaching to a running Workstation
+
+![Getting Logged Out](https://imgur.com/UqxlHay.png)
+
+PrecisionFDA has a very short lived session. If you get logged out at any point, you should be able to login again and attach to your Workstation.
+
+1. You can safely close any tabs with an old session
+2. Login to pFDA
+3. Connect to the running Workstation
+4. Run the following command:
+
+```shell
+docker ps
+```
+
+5.  If your output shows no running containers, it will look like this:
+    ![No Running Containers](https://imgur.com/I7qNx2K.png)
+
+You can restart the notebook by running
+
+```shell
+cd AMPL/
+. .env                    # Required to load configuration
+make jupyter-notebook
+```
+
+![Restarting Jupyter Notebook](https://imgur.com/WV41mJq.png)
+
+Otherwise if you have a running container, your `docker ps` output will look something like this:
+![Running container](https://imgur.com/noyeNUM.png)
+
+Then we can simply output the logs from it by running the following:
+docker logs:
+
+```
+docker logs $(docker ps -q)
+```
+
+From here we can copy the URL for the Jupyter Notebook
+![Get connection information for running container](https://imgur.com/DKz11Ri.png)
