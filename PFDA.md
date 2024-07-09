@@ -49,10 +49,10 @@ There are a couple options for importing an pre-trained model. Most models come 
 
 ![Pre-trained model example](https://i.imgur.com/W7rfzaD.png)
 
-2. In the Workstation tab, create a directory called `work/` and `cd` into it by running the following
+2. In the Workstation tab, cd into a directory called `work/` by running the following:
 
 ```
-mkdir work
+cd work
 ```
 
 ![mkdir command](https://i.imgur.com/4Xq9WPc.png)
