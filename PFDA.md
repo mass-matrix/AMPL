@@ -31,7 +31,7 @@ export WORK_DIR=work/                   # Working directory to use
 
 5. Run the `./start_pfda` command
 
-![Run start_pfda](https://i.imgur.com/bJGEjEx.png)
+![Run start_pfda](https://imgur.com/pAh8GQG.png)
 
 6. Copy the Jupyter Notebook URL
 
