@@ -1,0 +1,14 @@
+#!/bin/bash
+set -ex
+
+# Git repo
+git clone https://github.com/mass-matrix/AMPL
+cd AMPL/
+
+# Get config file
+yes | pfda download .env || true
+. .env
+
+# Docker
+make pull-docker
+make jupyter-notebook
