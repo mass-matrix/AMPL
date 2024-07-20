@@ -8,6 +8,7 @@ Author: Amanda Minnich
 # from __future__ import unicode_literals
 
 import argparse
+import copy
 import os
 import os.path
 import sys
@@ -17,14 +18,11 @@ import itertools
 from collections.abc import Iterable
 import pandas as pd
 import uuid
-
+import pickle
 import subprocess
+import traceback
 import shutil
 import time
-
-import traceback
-import copy
-import pickle
 
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 
@@ -35,8 +33,6 @@ from atomsci.ddm.pipeline import model_datasets as model_datasets
 from atomsci.ddm.utils import datastore_functions as dsf
 from atomsci.ddm.pipeline import model_tracker as trkr
 logging.basicConfig(format='%(asctime)-15s %(message)s')
-
-
 
 
 def run_command(shell_script, python_path, script_dir, params):

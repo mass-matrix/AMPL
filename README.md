@@ -21,6 +21,8 @@ The ATOM Modeling PipeLine (AMPL) extends the functionality of DeepChem and supp
 ## Table of contents
 - [Install](#install)
    - [Quick Install](#installation-quick-summary)
+   - [Install with M1 - M3 Chips](#install-with-m1---m3-chips)
+      - [Quick Install for M1 - M3 Chips](#installation-quick-summary-for-m1---m3-chips)
    - [Jupyter kernel](#create-jupyter-notebook-kernel-optional)
    - [Docker](#install-with-docker)
    - [Uninstall](#uninstall)
@@ -36,7 +38,7 @@ The ATOM Modeling PipeLine (AMPL) extends the functionality of DeepChem and supp
 
 ## Useful links
 - [Pipeline parameters (options)](atomsci/ddm/docs/PARAMETERS.md)
-- [Library documentation](https://ampl.readthedocs.io/en/latest/index.html)  
+- [Library documentation](https://ampl.readthedocs.io/en/latest/index.html)
 ---
 ## Install
 AMPL 1.6 supports Python 3.9 CPU or CUDA-enabled machines using CUDA 11.8 on Linux. All other systems are experimental. For a quick install summary, see [here](#install-summary). We do not support other CUDA versions because there are multiple ML package dependency conflicts that can occur. For more information you can look at [DeepChem](https://deepchem.readthedocs.io/en/latest/get_started/installation.html), [TensorFlow](https://www.tensorflow.org/install/pip), [PyTorch](https://pytorch.org/get-started/locally/), [DGL](https://www.dgl.ai/pages/start.html) or [Jax](https://github.com/google/jax#installation).
@@ -151,14 +153,195 @@ cd ..
 pip install -e .                        
 ```
 ---
+## Install with M1 - M3 chips
+AMPL 1.6 supports Python 3.9 CPU or CUDA-enabled machines using CUDA 11.8 on Linux. All other systems are experimental. For a quick install summary, see [here](#install-summary). We do not support other CUDA versions because there are multiple ML package dependency conflicts that can occur. For more information you can look at [DeepChem](https://deepchem.readthedocs.io/en/latest/get_started/installation.html), [TensorFlow](https://www.tensorflow.org/install/pip), [PyTorch](https://pytorch.org/get-started/locally/), [DGL](https://www.dgl.ai/pages/start.html) or [Jax](https://github.com/google/jax#installation).
+
+### Install Orbstack
+- Download and install Orbstack
+  - https://orbstack.dev/download
+- Create a Linux machine
+  - Distribution select: Ubuntu
+  - Version select: 24.04 LTS (Noble Numbat)
+  - CPU type: Apple
+
+### Installing Miniconda3
+- Open Linux terminal in Orbstack
+- Install wget
+
+```bash
+sudo apt update
+sudo apt install wget
+sudo apt update
+```
+- Install Miniconda3
+  - Make sure you are in the correct pathway when installing
+    
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
+chmod +x Miniconda3-latest-Linux-aarch64.sh
+./Miniconda3-latest-Linux-aarch64.sh
+~/miniconda3/bin/conda init               # initialize the miniconda3
+```
+
+### Create conda environment with Miniconda3
+
+#### 1. Create a conda env with Python 3.9.12
+Make sure to create your conda env in a convenient directory that has at least 12Gb space.
+
+Go to the directory where the new environment directory be installed in. Define an environment variable - "ENVROOT".
+
+```bash
+export ENVROOT=~/workspace # for LLNL LC users, use your workspace
+or
+export ENVROOT=~ # or the directory as your environment root
+cd $ENVROOT
+```
+
+> *We use "workspace" and "atomsci-env" as an example here.*
+
+```bash
+cd $ENVROOT
+conda create -n atomsci-env python=3.9.12          # creates atomsci-env with python 3.9.12
+```
+
+#### 2. Activate the environment
+
+```bash
+conda activate atomsci-env
+```
+> ***Note:*** *If you are unable to activate your conda environment make sure you are in the 'base' conda environment when activating atomsci-env*
+```bash
+conda activate base          # to switch into the 'base' conda environment
+```
+
+#### 3. Update pip
+```bash
+pip install pip --upgrade
+```
+
+#### 4. Clone AMPL repository
+```bash
+sudo apt update
+sudo apt install git                                            # install git to Linux terminal
+sudo apt update
+git clone https://github.com/ATOMScience-org/AMPL.git           # clones AMPL repository
+```
+
+#### 5. Install pip requirements
+Depending on system performance, creating the environment can take some time.
+> ***Note:*** *Based on which environment (CPU) you may have to edit or comment out jaxlib*
+
+- Run these commands so that you don't receive h5py wheel build error or gcc error
+```bash
+sudo apt install pkg-config
+sudo apt-get install  libhdf5-dev
+sudo apt-get install libxrender1
+sudo apt-get -y install gcc
+```
+- CPU installation:
+```bash
+cd AMPL/pip
+pip install -r cpu_requirements.txt
+```
+
+### Install AMPL
+Run the following to build the "atomsci" modules. This is required.
+> ***Note:*** *Should be in the AMPL directory*
+```bash
+# return to AMPL parent directory
+cd ..
+./build.sh
+pip install -e .
+```
+
+---
+## Installation Quick Summary for M1 - M3 chips
+> ***Note:*** *Should run these commands on Ubuntu terminal through Orbstack*
+```bash
+sudo apt update
+sudo apt install wget                                   # install wget to Linux terminal
+sudo apt update
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh    # install Miniconda3 to Linux terminal
+chmod +x Miniconda3-latest-Linux-aarch64.sh
+./Miniconda3-latest-Linux-aarch64.sh         
+~/miniconda3/bin/conda init                             # initialize Miniconda3
+
+export ENVROOT=~/workspace                              # set ENVROOT example
+cd $ENVROOT                                             # go to a convenient home directory             
+conda create -n atomsci-env python=3.9.12               # create environment with Python 3.9.12
+conda init                                              # initialize conda 
+conda activate atomsci-env                              # activate atomsci-env environment 
+pip install pip --upgrade
+              
+sudo apt update
+sudo apt install git                                    # install git to Linux terminal
+sudo apt update
+git clone https://github.com/ATOMScience-org/AMPL.git   # clones AMPL repository
+
+cd AMPL/pip    
+sudo apt install pkg-config
+sudo apt-get install libxrender1
+sudo apt-get install  libhdf5-dev                       # fixes h5py errors when installing cpu_requirements.txt
+sudo apt-get -y install gcc                             # fixes gcc errors when installing cpu_requirements.txt
+pip install -r cpu_requirements.txt                     # install cpu_requirements.txt
+
+cd ..                                                   # return to AMPL parent directory
+./build.sh                            
+pip install -e .                        
+```
+---
 ## Create jupyter notebook kernel (optional)
 To run AMPL from Jupyter Notebook, with your environment activated. To setup a new kernel:
 
 ```
 python -m ipykernel install --user --name atomsci-env
 ```
+If Jupyter Lab/Notebook is not installed in new environment
+```bash
+pip install jupyterlab
+python -m ipykernel install --user --name atomsci-env
+```
 ---
 ## Install with Docker
+
+### Using Makefile
+
+If you have `make` installed on your computer, you can quickly get a notebook up and running using the available commands. See further documentation in [Makefile.md](./Makefile.md) and script definitions in [Makefile](./Makefile)
+
+#### Environment Variables
+
+- `ENV`: Set the environment (default: `dev`).
+- `JUPYTER_PORT`: Set the Jupyter Notebook port (default: `8888`).
+- `PLATFORM`: Set the platform (default: `gpu`).
+- `PYTHON_BIN`: Path to the Python executable.
+- `IMAGE_REPO`: Docker image repository (default: `atomsci/atomsci-ampl`).
+- `VENV`: Virtual environment directory (default: `venv`).
+- `WORK_DIR`: Work directory (default: `work`).
+
+#### Key Targets
+
+| Target             | Description                                                  | Command                 |
+| ------------------ | ------------------------------------------------------------ | ----------------------- |
+| `push-docker`      | Push Docker image for the specified platform and environment | `make push-docker`      |
+| `build-docker`     | Build Docker image for the specified platform                | `make build-docker`     |
+| `install`          | Install atomsci-ampl using the system Python                 | `make install`          |
+| `install-system`   | Install atomsci-ampl into the specified Python environment   | `make install-system`   |
+| `install-venv`     | Install atomsci-ampl into the virtual environment            | `make install-venv`     |
+| `jupyter-notebook` | Run Jupyter Notebook inside a Docker container               | `make jupyter-notebook` |
+| `jupyter-lab`      | Run Jupyter Lab inside a Docker container                    | `make jupyter-lab`      |
+| `pytest`           | Run pytest using the virtual environment                     | `make pytest`           |
+| `ruff`             | Run ruff linter                                              | `make ruff`             |
+| `ruff-fix`         | Run ruff linter with auto-fix                                | `make ruff-fix`         |
+| `setup`            | Setup virtual environment with CPU dependencies              | `make setup`            |
+| `uninstall`        | Uninstall atomsci-ampl                                       | `make uninstall`        |
+| `uninstall-system` | Uninstall atomsci-ampl from the system Python                | `make uninstall-system` |
+| `uninstall-venv`   | Uninstall atomsci-ampl from the virtual environment          | `make uninstall-venv`   |
+
+For more detailed information on the `Makefile`, refer to the file itself in the repository.
+
+### Manual Steps
+
 - Download and install Docker Desktop.
   - https://www.docker.com/get-started
 - Create a workspace folder to mount with Docker environment and transfer files. 
@@ -177,8 +360,7 @@ python -m ipykernel install --user --name atomsci-env
   - If this doesn't work, exit the container and change port from 8888 to some other number such as 7777 or 8899 (in all 3 places it's written), then rerun both commands
 - From the notebook, you may need to set the kernel that atomsci is installed ("atomsci-venv") in order to acccess the `atomsci` package.
 
-> ***Note***: *Be sure to save any work you want to be permanent in your workspace folder. If the container is shut down, you'll lose anything not in that folder.*  
----
+
 
 ## Uninstall
 To remove AMPL from a pip environment use:
