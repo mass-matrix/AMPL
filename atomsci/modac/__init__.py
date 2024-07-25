@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Callable, Any, Dict
+from typing import Callable, Any, Dict, Union
 import requests
 from requests.auth import HTTPBasicAuth
 from functools import wraps
@@ -52,7 +52,7 @@ class MoDaCClient:
 
     @ensure_authenticated
     @log_action
-    def get_collection(self, path: str) -> Collection:
+    def get_collection(self, path: str) -> Union[Collection, None]:
         url = "/".join((self.BASE_URL, "collection", path))
         _logger.warning(f"Get collection. Making requests to {url}")
 
@@ -61,10 +61,10 @@ class MoDaCClient:
             resp.raise_for_status()
         except requests.exceptions.HTTPError as e:
             _logger.error(f"HTTPError: {e}")
-            _logger.error(f"Response Content: {resp.content}")
+            _logger.error(f"Response Content: {resp.content.decode('utf-8')}")
             raise
         collection_response: CollectionResponse = resp.json().get("collections", [])[0]
-        return collection_response.get("collection", {})
+        return collection_response.get("collection")
 
     @ensure_authenticated
     @log_action
@@ -100,26 +100,27 @@ class MoDaCClient:
         self, path: str, download_sub_collection: bool = False
     ) -> None:
         collection = self.get_collection(path)
-        collection_name = collection["collectionName"].split("/")[-1]
+        if collection is not None:
+            collection_name = collection["collectionName"].split("/")[-1]
+            # Create directory for collection
+            if not os.path.exists(collection_name):
+                os.makedirs(collection_name)
 
-        # Create directory for collection
-        if not os.path.exists(collection_name):
-            os.makedirs(collection_name)
+            # Extract data object paths
+            data_objects = collection.get("dataObjects", [])
 
-        # Extract data object paths
-        data_objects = collection.get("dataObjects", [])
+            for data_object in data_objects:
+                file_path = data_object.get("path")
+                if file_path:
+                    local_filename = os.path.join(collection_name, file_path.split("/")[-1])
+                    self.download_file(file_path, local_filename)
+                    _logger.info(f"Downloaded: {local_filename}")
 
-        for data_object in data_objects:
-            file_path = data_object.get("path")
-            if file_path:
-                local_filename = os.path.join(collection_name, file_path.split("/")[-1])
-                self.download_file(file_path, local_filename)
-                _logger.info(f"Downloaded: {local_filename}")
+            if download_sub_collection:
+                # Extract sub-collection paths and recursively download their files
+                sub_collections = collection.get("subCollections", [])
+                for sub_collection in sub_collections:
+                    sub_collection_path = sub_collection.get("path")
+                    if sub_collection_path:
+                        self.download_all_files_in_collection(sub_collection_path, True)
 
-        if download_sub_collection:
-            # Extract sub-collection paths and recursively download their files
-            sub_collections = collection.get("subCollections", [])
-            for sub_collection in sub_collections:
-                sub_collection_path = sub_collection.get("path")
-                if sub_collection_path:
-                    self.download_all_files_in_collection(sub_collection_path, True)
