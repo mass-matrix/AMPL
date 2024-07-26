@@ -1,7 +1,9 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from atomsci.modac import MoDaCClient, ensure_authenticated
+import requests
+
+from atomsci.modac import MoDaCClient, ensure_authenticated, MoDaCClientError
 
 
 class TestMoDaCClient(unittest.TestCase):
@@ -84,3 +86,23 @@ class TestMoDaCClient(unittest.TestCase):
         mock_download_file.assert_called_once_with(
             "mock_file_path", "mock_collection/mock_file_path"
         )
+
+    @patch("atomsci.modac.requests.get")
+    @patch("atomsci.modac.MoDaCClient._login_headers", return_value={})
+    def test_authenticate_server_error(self, mock_login_headers, mock_get):
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            response=MagicMock(status_code=502)
+        )
+        mock_resp.content.decode.return_value = "Bad Gateway"
+        mock_get.return_value = mock_resp
+
+        with self.assertRaises(MoDaCClientError) as context:
+            client = MoDaCClient()
+            mock_get.assert_called_once_with(f"{client.BASE_URL}/authenticate", auth={})
+
+        self.assertIn("Authentication failed: 502", str(context.exception))
+
+
+if __name__ == "__main__":
+    unittest.main()
