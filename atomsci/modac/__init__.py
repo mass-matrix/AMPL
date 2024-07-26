@@ -12,6 +12,10 @@ _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
 
 
+class MoDaCClientError(Exception):
+    pass
+
+
 def ensure_authenticated(func: Callable) -> Callable:
     @wraps(func)
     def wrapper(self: "MoDaCClient", *args: Any, **kwargs: Any) -> Any:
@@ -45,10 +49,18 @@ class MoDaCClient:
 
     def authenticate(self) -> bool:
         url = "/".join((self.BASE_URL, "authenticate"))
-        auth_resp = requests.get(url, auth=self._login_headers())
-        auth_resp.raise_for_status()
-        self._token = auth_resp.content.decode("utf-8")
-        return True
+        try:
+            auth_resp = requests.get(url, auth=self._login_headers())
+            auth_resp.raise_for_status()
+            self._token = auth_resp.content.decode("utf-8")
+            return True
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 502:
+                _logger.error("Server error 502: Bad Gateway. Please try again later.")
+            else:
+                _logger.error(f"HTTPError: {e}")
+            _logger.error(f"Response Content: {e.response.content.decode('utf-8')}")
+            raise MoDaCClientError(f"Authentication failed: {e.response.status_code}") from e
 
     @ensure_authenticated
     @log_action
