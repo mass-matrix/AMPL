@@ -16,6 +16,8 @@ export IMAGE_REPO=atomsci/atomsci-ampl  # Name of the dockerhub repository
 export JUPYTER_PORT=8080                # Port 8080 is open by default on pFDA
 export PLATFORM=cpu                     # Can be cpu / gpu
 export WORK_DIR=work/                   # Working directory to use
+export MODAC_USER=my-modac-username     # Username to https://modac.cancer.gov/
+export MODAC_PASS=my-modac-pass         # Password to https://modac.cancer.gov/
 ```
 
 2. Upload this to your Files section:
