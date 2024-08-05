@@ -191,20 +191,17 @@ class MoDaCClient:
                 json.dumps(attributes_file),
                 "application/json",
             ),
-            "dataObject": (
-                os.path.basename(data_file_path),
-                open(data_file_path, "rb"),
-            ),
         }
 
         _logger.warning(f"Uploading file to {url}")
         try:
-            with requests.put(url, files=files, headers=self._token_headers()) as resp:
-                resp.raise_for_status()
-                _logger.info(f"File uploaded successfully: {resp.json()}")
-                return True
+            with open(data_file_path, "rb") as f:
+                files["dataObject"] = (os.path.basename(data_file_path), f)
+                with requests.put(url, files=files, headers=self._token_headers()) as resp:
+                    resp.raise_for_status()
+                    _logger.info(f"File uploaded successfully: {resp.json()}")
+                    return True
         except requests.exceptions.RequestException as e:
             _logger.error(f"File upload failed: {e}")
-            raise
-        finally:
-            files["dataObject"][1].close()
+            raise e
+
