@@ -54,6 +54,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
+    timeout-minutes: 45
     steps:
       - name: System Dependencies
         run: |
