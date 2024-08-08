@@ -22,6 +22,10 @@ WORK_DIR ?= work
 .PHONY: build-docker install install-dev install-system install-venv jupyter-notebook jupyter-lab \
 	pytest ruff ruff-fix setup uninstall uninstall-dev uninstall-system uninstall-venv
 
+# Load Docker image
+load-docker:
+	docker load < ampl-$(PLATFORM)-$(ENV).tar.gz
+
 # Pull Docker image
 pull-docker:
 	docker pull $(IMAGE_REPO):$(PLATFORM)-$(ENV)
@@ -29,6 +33,10 @@ pull-docker:
 # Push Docker image
 push-docker:
 	docker push $(IMAGE_REPO):$(PLATFORM)-$(ENV)
+
+# Save Docker image
+save-docker:
+	docker save $(IMAGE_REPO):$(PLATFORM)-$(ENV) | gzip > ampl-$(PLATFORM)-$(ENV).tar.gz
 
 # Build Docker image
 build-docker:
@@ -57,7 +65,7 @@ jupyter-notebook:
 	@echo "Starting Jupyter Notebook"
 	docker run -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
 		-v $(shell pwd)/../$(WORK_DIR):/$(WORK_DIR) $(IMAGE_REPO):$(PLATFORM)-$(ENV) \
-		/bin/bash -l -c "jupyter-notebook --ip=0.0.0.0 --allow-root --port=$(JUPYTER_PORT)"
+		/bin/bash -l -c "jupyter-notebook --ip=0.0.0.0 --no-browser --allow-root --port=$(JUPYTER_PORT)"
 
 # Run Jupyter Lab
 jupyter-lab:

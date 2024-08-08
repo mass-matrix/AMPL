@@ -10,5 +10,6 @@ yes | pfda download .env || true
 . .env
 
 # Docker
-make pull-docker
+pfda download "ampl-${PLATFORM}-${ENV}.tar.gz" .
+make load-docker
 make jupyter-notebook
